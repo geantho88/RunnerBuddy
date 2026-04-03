@@ -1,29 +1,39 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using RunnerBuddy.Models.AirPolution;
 using RunnerBuddy.Models.Weather;
 using RunnerBuddy.Services;
 using System.Net.Http.Json;
+using System.Reflection;
+
 
 public class WeatherService : IWeatherService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<WeatherService> _logger; // 1. Add Logger field
 
-    private const string ApiKey = "b77bd67583c779bb7d3437c3afb24d46";
-    private const string BaseUrl = "https://api.openweathermap.org/data/2.5/weather";
+    private readonly string _apiKey;
+    private readonly string _baseUrl;
 
     // 2. Inject ILogger via constructor
     public WeatherService(HttpClient httpClient, ILogger<WeatherService> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
+
+        var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("RunnerBuddy.AppSettings.json");
+        
+        var config = new ConfigurationBuilder().AddJsonStream(stream).Build();
+
+        _apiKey = config["ApiKey"];
+        _baseUrl = config["BaseUrl"];
     }
 
     public async Task<WeatherData?> GetWeatherAsync(double latitude, double longitude)
     {
         try
         {
-            var url = $"{BaseUrl}?lat={latitude}&lon={longitude}&appid={ApiKey}&units=metric";
+            var url = $"{_baseUrl}?lat={latitude}&lon={longitude}&appid={_apiKey}&units=metric";
             return await _httpClient.GetFromJsonAsync<WeatherData>(url);
         }
         catch (Exception ex)
@@ -37,7 +47,7 @@ public class WeatherService : IWeatherService
     {
         try
         {
-            var url = $"https://api.openweathermap.org/data/2.5/air_pollution?lat={latitude}&lon={longitude}&appid={ApiKey}";
+            var url = $"https://api.openweathermap.org/data/2.5/air_pollution?lat={latitude}&lon={longitude}&appid={_apiKey}";
             return await _httpClient.GetFromJsonAsync<AirPollutionData>(url);
         }
         catch (Exception ex)
