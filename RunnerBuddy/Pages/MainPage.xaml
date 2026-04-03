@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="RunnerBuddy.Pages.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:DataType="MainPageViewModel">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="25">
+
+            <!--  Quick Stats Section  -->
+            <HorizontalStackLayout>
+                <Image
+                    HeightRequest="48"
+                    Source="runner.png"
+                    WidthRequest="48" />
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="24"
+                    Text="Quick Stats"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="15">
+                <Border
+                    Grid.Column="0"
+                    Padding="12"
+                    BackgroundColor="White"
+                    StrokeShape="RoundRectangle 12"
+                    Style="{StaticResource BorderShadow}">
+                    <VerticalStackLayout
+                        HorizontalOptions="Center"
+                        Spacing="5"
+                        VerticalOptions="Center">
+                        <Label
+                            FontSize="12"
+                            HorizontalOptions="Center"
+                            TextColor="Gray">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold" Text="Weather Now - " />
+                                    <Span FontAttributes="Bold" Text="{Binding Location}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            HorizontalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontAttributes="Bold" Text="{Binding WeatherDescription}" />
+                                    <Span FontAttributes="Bold" Text=" (" />
+                                    <Span FontAttributes="Bold" Text="{Binding Temperature}" />
+                                    <Span FontAttributes="Bold" Text=")" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border
+                    Grid.Column="1"
+                    Padding="12"
+                    BackgroundColor="White"
+                    StrokeShape="RoundRectangle 12"
+                    Style="{StaticResource BorderShadow}">
+                    <VerticalStackLayout
+                        HorizontalOptions="Center"
+                        Spacing="5"
+                        VerticalOptions="Center">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="12"
+                            HorizontalOptions="Center"
+                            Text="Air Quality Now"
+                            TextColor="Gray" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            HorizontalOptions="Center"
+                            Text="{Binding AirQuality}" />
+                        <Label
+                            FontSize="14"
+                            HorizontalOptions="Center"
+                            Text="{Binding AirQualityAdditionalInfos}"
+                            TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border
+                    Grid.Column="2"
+                    Padding="12"
+                    BackgroundColor="White"
+                    StrokeShape="RoundRectangle 12"
+                    Style="{StaticResource BorderShadow}">
+                    <VerticalStackLayout
+                        HorizontalOptions="Center"
+                        Spacing="5"
+                        VerticalOptions="Center">
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="12"
+                            HorizontalOptions="Center"
+                            Text="Humidity Now"
+                            TextColor="Gray" />
+                        <Label
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            HorizontalOptions="Center"
+                            Text="{Binding Humidity}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!--  Recommendation Section  -->
+            <Label
+                FontAttributes="Bold"
+                FontSize="24"
+                Text="Recommendation" />
+            <Border
+                Padding="20"
+                BackgroundColor="White"
+                StrokeShape="RoundRectangle 15"
+                Style="{StaticResource BorderShadow}">
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="10">
+                    <Image
+                        HeightRequest="140"
+                        Source="buddy_icon.png"
+                        WidthRequest="140"
+                        ZIndex="1" />
+                    <Label
+                        FontAttributes="Bold"
+                        HorizontalOptions="Center"
+                        Text="TOMORROW'S BEST RUN:" />
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="32"
+                        HorizontalOptions="Center"
+                        Text="6:00 AM"
+                        TextColor="#007AFF" />
+                    <Label
+                        HorizontalOptions="Center"
+                        Text="Clear, 16°C"
+                        TextColor="Gray" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!--  Activity Section  -->
+            <Label
+                FontAttributes="Bold"
+                FontSize="24"
+                Text="City Activity" />
+            <Border
+                Padding="15"
+                BackgroundColor="#FFF5F5"
+                Stroke="Red"
+                StrokeShape="RoundRectangle 12">
+                <HorizontalStackLayout Spacing="10">
+                    <Label
+                        FontSize="18"
+                        Text="⚠️"
+                        VerticalOptions="Center" />
+                    <VerticalStackLayout Spacing="2">
+                        <Label
+                            FontAttributes="Bold"
+                            Text="ALERTS:"
+                            TextColor="Red" />
+                        <Label FontSize="12" Text="1 Roadblock (Main St. event) - Re-route planned." />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+
+            <!--  City Vibe Section  -->
+            <VerticalStackLayout Spacing="20">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="24"
+                    Text="City Vibe" />
+                <Border
+                    Padding="0"
+                    BackgroundColor="#E0E0E0"
+                    HeightRequest="200"
+                    StrokeShape="RoundRectangle 15">
+                    <Grid>
+                        <Label
+                            HorizontalOptions="Center"
+                            Text="Map View with Roadblocks"
+                            TextColor="Gray"
+                            VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="RunnerBuddy.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:RunnerBuddy.Pages"
+    xmlns:sf="clr-namespace:Syncfusion.Maui.Toolkit.SegmentedControl;assembly=Syncfusion.Maui.Toolkit"
+    Title="RunnerBuddy"
+    Shell.FlyoutBehavior="Flyout">
+
+    <ShellContent
+        Title="Dashboard"
+        ContentTemplate="{DataTemplate pages:MainPage}"
+        Icon="{StaticResource IconDashboard}"
+        Route="main" />
+
+    <!--<ShellContent
+        Title="Projects"
+        Icon="{StaticResource IconProjects}"
+        ContentTemplate="{DataTemplate pages:ProjectListPage}"
+        Route="projects" />
+
+    <ShellContent
+        Title="Manage Meta"
+        Icon="{StaticResource IconMeta}"
+        ContentTemplate="{DataTemplate pages:ManageMetaPage}"
+        Route="manage" />-->
+</Shell>
