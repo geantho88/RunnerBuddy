@@ -22,11 +22,10 @@ public class WeatherService : IWeatherService
         _logger = logger;
 
         var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("RunnerBuddy.AppSettings.json");
-        
         var config = new ConfigurationBuilder().AddJsonStream(stream).Build();
 
-        _apiKey = config["ApiKey"];
-        _baseUrl = config["BaseUrl"];
+        _apiKey = config["OpenWeather:ApiKey"];
+        _baseUrl = config["OpenWeather:BaseUrl"];
     }
 
     public async Task<WeatherData?> GetWeatherAsync(double latitude, double longitude)

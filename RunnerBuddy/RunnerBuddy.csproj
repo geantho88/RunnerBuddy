@@ -68,6 +68,27 @@
 	  <None Remove="AppSettings.json" />
 	  <None Remove="Resources\AppIcon\buddy_icon.png" />
 	  <None Remove="Resources\AppIcon\runner.png" />
+	  <None Remove="Resources\Images\weather-set\cloudy.png" />
+	  <None Remove="Resources\Images\weather-set\cloudy_s_rain.png" />
+	  <None Remove="Resources\Images\weather-set\cloudy_s_snow.png" />
+	  <None Remove="Resources\Images\weather-set\cloudy_s_sunny.png" />
+	  <None Remove="Resources\Images\weather-set\fog.png" />
+	  <None Remove="Resources\Images\weather-set\partly_cloudy.png" />
+	  <None Remove="Resources\Images\weather-set\rain.png" />
+	  <None Remove="Resources\Images\weather-set\rain_heavy.png" />
+	  <None Remove="Resources\Images\weather-set\rain_light.png" />
+	  <None Remove="Resources\Images\weather-set\rain_s_cloudy.png" />
+	  <None Remove="Resources\Images\weather-set\rain_s_snow.png" />
+	  <None Remove="Resources\Images\weather-set\rain_s_sunny.png" />
+	  <None Remove="Resources\Images\weather-set\snow.png" />
+	  <None Remove="Resources\Images\weather-set\snow_heavy.png" />
+	  <None Remove="Resources\Images\weather-set\snow_light.png" />
+	  <None Remove="Resources\Images\weather-set\snow_s_cloudy.png" />
+	  <None Remove="Resources\Images\weather-set\snow_s_rain.png" />
+	  <None Remove="Resources\Images\weather-set\sunny.png" />
+	  <None Remove="Resources\Images\weather-set\sunny_s_cloudy.png" />
+	  <None Remove="Resources\Images\weather-set\sunny_s_rain.png" />
+	  <None Remove="Resources\Images\weather-set\thunderstorms.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -75,21 +96,46 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
+		<PackageReference Include="CommunityToolkit.Maui.Markup" Version="7.0.1" />
+		<PackageReference Include="Microsoft.Extensions.AI" Version="10.4.1" />
+		<PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.4.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.51" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="12.3.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.1" />
 		<PackageReference Include="Syncfusion.Maui.Core" Version="33.1.46" />
 		<PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.9" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiImage Include="Resources\AppIcon\runner.png" />
+	  <MauiImage Include="Resources\Images\weather-set\cloudy.png" />
+	  <MauiImage Include="Resources\Images\weather-set\cloudy_s_rain.png" />
+	  <MauiImage Include="Resources\Images\weather-set\cloudy_s_snow.png" />
+	  <MauiImage Include="Resources\Images\weather-set\cloudy_s_sunny.png" />
+	  <MauiImage Include="Resources\Images\weather-set\fog.png" />
+	  <MauiImage Include="Resources\Images\weather-set\partly_cloudy.png" />
+	  <MauiImage Include="Resources\Images\weather-set\rain.png" />
+	  <MauiImage Include="Resources\Images\weather-set\rain_heavy.png" />
+	  <MauiImage Include="Resources\Images\weather-set\rain_light.png" />
+	  <MauiImage Include="Resources\Images\weather-set\rain_s_cloudy.png" />
+	  <MauiImage Include="Resources\Images\weather-set\rain_s_snow.png" />
+	  <MauiImage Include="Resources\Images\weather-set\rain_s_sunny.png" />
+	  <MauiImage Include="Resources\Images\weather-set\snow.png" />
+	  <MauiImage Include="Resources\Images\weather-set\snow_heavy.png" />
+	  <MauiImage Include="Resources\Images\weather-set\snow_light.png" />
+	  <MauiImage Include="Resources\Images\weather-set\snow_s_cloudy.png" />
+	  <MauiImage Include="Resources\Images\weather-set\snow_s_rain.png" />
+	  <MauiImage Include="Resources\Images\weather-set\sunny.png" />
+	  <MauiImage Include="Resources\Images\weather-set\sunny_s_cloudy.png" />
+	  <MauiImage Include="Resources\Images\weather-set\sunny_s_rain.png" />
+	  <MauiImage Include="Resources\Images\weather-set\thunderstorms.png" />
 	</ItemGroup>
 	
 </Project>

@@ -3,8 +3,16 @@
     x:Class="RunnerBuddy.Pages.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/maui/global"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:modelsRecommendationPlan="clr-namespace:RunnerBuddy.Models.RecommendationPlan"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     x:DataType="MainPageViewModel">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="25">
 
@@ -17,9 +25,19 @@
                 <Label
                     FontAttributes="Bold"
                     FontSize="24"
+                    Text="RunnerBuddy"
+                    VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <!--  Quick Stats Section  -->
+            <HorizontalStackLayout>
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="24"
                     Text="Quick Stats"
                     VerticalOptions="Center" />
             </HorizontalStackLayout>
+
 
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="15">
                 <Border
@@ -114,37 +132,235 @@
             </Grid>
 
             <!--  Recommendation Section  -->
-            <Label
-                FontAttributes="Bold"
-                FontSize="24"
-                Text="Recommendation" />
-            <Border
-                Padding="20"
-                BackgroundColor="White"
-                StrokeShape="RoundRectangle 15"
-                Style="{StaticResource BorderShadow}">
-                <VerticalStackLayout HorizontalOptions="Center" Spacing="10">
-                    <Image
-                        HeightRequest="140"
-                        Source="buddy_icon.png"
-                        WidthRequest="140"
-                        ZIndex="1" />
-                    <Label
-                        FontAttributes="Bold"
-                        HorizontalOptions="Center"
-                        Text="TOMORROW'S BEST RUN:" />
-                    <Label
-                        FontAttributes="Bold"
-                        FontSize="32"
-                        HorizontalOptions="Center"
-                        Text="6:00 AM"
-                        TextColor="#007AFF" />
-                    <Label
-                        HorizontalOptions="Center"
-                        Text="Clear, 16°C"
-                        TextColor="Gray" />
-                </VerticalStackLayout>
-            </Border>
+            <VerticalStackLayout Spacing="10">
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="24"
+                    Text="Get Recommendations"
+                    TextColor="#1C1C1E" />
+
+                <Border
+                    Padding="0"
+                    BackgroundColor="White"
+                    StrokeShape="RoundRectangle 15"
+                    StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow
+                            Brush="Black"
+                            Opacity="0.1"
+                            Radius="10"
+                            Offset="0,2" />
+                    </Border.Shadow>
+
+                    <Grid RowDefinitions="Auto, Auto">
+
+                        <HorizontalStackLayout
+                            Grid.Row="0"
+                            Padding="15"
+                            Spacing="10"
+                            VerticalOptions="Start">
+
+                            <Border
+                                HeightRequest="178"
+                                HorizontalOptions="Start"
+                                StrokeShape="RoundRectangle 25"
+                                VerticalOptions="Center"
+                                WidthRequest="178">
+                                <Image Aspect="AspectFit" Source="buddy_icon.png" />
+                            </Border>
+
+                            <Border
+                                Padding="15"
+                                BackgroundColor="#007AFF"
+                                MaximumWidthRequest="260"
+                                StrokeShape="RoundRectangle 15,15,15,0">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="14"
+                                        Text="RunnerBuddy"
+                                        TextColor="#D1E9FF" />
+                                    <Label
+                                        FontSize="15"
+                                        LineBreakMode="WordWrap"
+                                        Text="I’ve locked onto your coordinates in! I’m ready to analyze the weather conditions and other environmental factors in your area to find your best run windows. Not satisfied with my recommendations? Set your preferences and try again! 🏃‍♂️"
+                                        TextColor="White" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <Grid
+                            Grid.Row="1"
+                            Padding="15,10"
+                            BackgroundColor="#FAFAFA"
+                            ColumnDefinitions="*, Auto"
+                            ColumnSpacing="10"
+                            VerticalOptions="End">
+                            <Button
+                                Grid.Column="1"
+                                BackgroundColor="#007AFF"
+                                Command="{Binding GetRunningScheduleCommand}"
+                                CornerRadius="22"
+                                FontAttributes="Bold"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                Text="Refresh Recommendations Now!"
+                                TextColor="White">
+                                <Button.Triggers>
+                                    <Trigger TargetType="Button" Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </Trigger>
+                                </Button.Triggers>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+            <VerticalStackLayout Spacing="10">
+
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="24"
+                    Text="Buddy's Best Windows"
+                    TextColor="#1C1C1E" />
+
+                <CollectionView
+                    ItemSizingStrategy="MeasureAllItems"
+                    ItemsLayout="HorizontalList"
+                    ItemsSource="{Binding RecommendationPlan.DailySuggestions}"
+                    SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="modelsRecommendationPlan:DaySuggestion">
+                            <StackLayout Padding="0" Spacing="12">
+
+                                <!--  Card Container  -->
+                                <Border
+                                    Margin="16,8"
+                                    Padding="0"
+                                    BackgroundColor="#FFFFFF"
+                                    HeightRequest="500"
+                                    StrokeShape="RoundRectangle 20"
+                                    StrokeThickness="0"
+                                    WidthRequest="250">
+
+                                    <Border.Shadow>
+                                        <Shadow
+                                            Brush="#000000"
+                                            Opacity="0.08"
+                                            Radius="14"
+                                            Offset="0,6" />
+                                    </Border.Shadow>
+
+                                    <Grid
+                                        Padding="20"
+                                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                                        RowSpacing="12">
+
+                                        <!--  Day  -->
+                                        <Label
+                                            Grid.Row="0"
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            Text="{Binding Day}"
+                                            TextColor="#8E8E93" />
+
+                                        <!--  Time  -->
+                                        <Label
+                                            Grid.Row="1"
+                                            FontAttributes="Bold"
+                                            FontSize="26"
+                                            Text="{Binding BestStartTime}"
+                                            TextColor="#FF9500" />
+
+                                        <!--  Weather Icon  -->
+                                        <Image
+                                            Grid.Row="2"
+                                            HeightRequest="128"
+                                            HorizontalOptions="Center"
+                                            Source="{Binding WeatherIcon}"
+                                            VerticalOptions="Center"
+                                            WidthRequest="128" />
+
+                                        <!--  Weather Description  -->
+                                        <Label
+                                            Grid.Row="3"
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            LineBreakMode="WordWrap"
+                                            Text="{Binding WeatherDescription}"
+                                            TextColor="#333333" />
+
+                                        <!--  Reason  -->
+                                        <Label
+                                            Grid.Row="4"
+                                            FontSize="14"
+                                            LineBreakMode="WordWrap"
+                                            MaxLines="3"
+                                            Text="{Binding Reason}"
+                                            TextColor="#555555" />
+
+                                        <!--  AQI Badge  -->
+                                        <Border
+                                            Grid.Row="5"
+                                            Padding="8,4"
+                                            BackgroundColor="#E8F5E9"
+                                            HorizontalOptions="Start"
+                                            StrokeShape="RoundRectangle 12"
+                                            StrokeThickness="0">
+
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="12"
+                                                Text="{Binding Aqi, StringFormat='AQI: {0}'}"
+                                                TextColor="#2E7D32" />
+                                        </Border>
+
+                                        <!--  Add to Schedule Button  -->
+                                        <Button
+                                            Grid.Row="6"
+                                            Padding="12,8"
+                                            BackgroundColor="#007AFF"
+                                            Command="{Binding AddToCalendarCommand}"
+                                            CornerRadius="25"
+                                            FontAttributes="Bold"
+                                            FontSize="14"
+                                            Text="Add to Schedule"
+                                            TextColor="White" />
+                                    </Grid>
+                                </Border>
+                            </StackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Border
+                    Padding="15"
+                    BackgroundColor="#ffffff"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0">
+                    <Grid ColumnDefinitions="Auto, *">
+                        <Image
+                            Margin="0,0,12,0"
+                            Aspect="AspectFit"
+                            HeightRequest="84"
+                            Source="fox2.png"
+                            VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label
+                                CharacterSpacing="1"
+                                FontAttributes="Bold"
+                                FontSize="14"
+                                Text="BUDDY TIP"
+                                TextColor="#1C1C1E" />
+                            <Label
+                                FontSize="16"
+                                LineBreakMode="WordWrap"
+                                Text="{Binding RecommendationPlan.BuddyTip}"
+                                TextColor="#333333" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+            </VerticalStackLayout>
 
             <!--  Activity Section  -->
             <Label
@@ -170,27 +386,6 @@
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
             </Border>
-
-            <!--  City Vibe Section  -->
-            <VerticalStackLayout Spacing="20">
-                <Label
-                    FontAttributes="Bold"
-                    FontSize="24"
-                    Text="City Vibe" />
-                <Border
-                    Padding="0"
-                    BackgroundColor="#E0E0E0"
-                    HeightRequest="200"
-                    StrokeShape="RoundRectangle 15">
-                    <Grid>
-                        <Label
-                            HorizontalOptions="Center"
-                            Text="Map View with Roadblocks"
-                            TextColor="Gray"
-                            VerticalOptions="Center" />
-                    </Grid>
-                </Border>
-            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

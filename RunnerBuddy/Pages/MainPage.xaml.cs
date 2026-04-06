@@ -16,9 +16,9 @@ namespace RunnerBuddy.Pages
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            if (_model != null)
+            if (_model?.RefreshAllDataCommand != null)
             {
-                await _model.LoadWeatherCommand.ExecuteAsync(null);
+                await _model.RefreshAllDataCommand.ExecuteAsync(null);
             }
         }
     }
