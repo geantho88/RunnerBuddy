@@ -1,12 +1,11 @@
-using Azure;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using RunnerBuddy.Models.RecommendationPlan;
 using RunnerBuddy.Services;
+using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace RunnerBuddy.ViewModels;
 
@@ -24,6 +23,7 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty] private string weatherDescription = "--";
     [ObservableProperty] private string airQuality = "--";
     [ObservableProperty] private string airQualityAdditionalInfos = "--";
+    [ObservableProperty] private string userInstructions = string.Empty;
     [ObservableProperty] private RunningPlan recommendationPlan = new RunningPlan();
 
     public MainPageViewModel(ILogger<MainPageViewModel> logger, IWeatherService weatherService, IChatClient chatClient)
@@ -40,7 +40,10 @@ public partial class MainPageViewModel : ObservableObject
     [RelayCommand]
     private async Task RefreshAllDataAsync()
     {
-        if (IsBusy) return;
+        if (IsBusy)
+        {
+            return;
+        }
 
         try
         {
@@ -57,7 +60,26 @@ public partial class MainPageViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "Full refresh cycle failed");
-            await Shell.Current.DisplayAlertAsync("Error", "Buddy tripped! Check your connection and GPS.", "OK");
+            await Shell.Current.DisplayAlertAsync("Error", $"Buddy failed! {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task RefreshRunningScheduleAsync()
+    {
+        try
+        {
+            IsBusy = true;
+            await GetRecommendationsAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Refresh running schedule failed");
+            await Shell.Current.DisplayAlertAsync("Error", $"Buddy failed! {ex.Message}", "OK");
         }
         finally
         {
@@ -83,7 +105,7 @@ public partial class MainPageViewModel : ObservableObject
 
     private async Task GetCurrentLocationAsync()
     {
-        _currentLocation = await Geolocation.Default.GetLastKnownLocationAsync()?? await Geolocation.Default.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(5)));
+        _currentLocation = await Geolocation.Default.GetLastKnownLocationAsync() ?? await Geolocation.Default.GetLocationAsync(new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(5)));
     }
 
     private async Task LoadWeatherAsync()
@@ -116,8 +138,6 @@ public partial class MainPageViewModel : ObservableObject
             return;
         }
 
-        // Structured Prompt for 2026 AI standards
-        // Get the current date in a readable format
         var today = DateTime.Now.ToString("dddd, MMM dd, yyyy");
 
         var prompt = $@"
@@ -127,32 +147,42 @@ public partial class MainPageViewModel : ObservableObject
                     Current Weather: {Temperature}, {WeatherDescription}, {Humidity} Humidity.
                     Air Quality Index: {AirQuality}.
 
-                    TASK: Starting from TODAY ({today}), suggest optimal running windows for the next 7 days...
-    
+                    TASK: Starting from TODAY ({today}), suggest optimal running windows for the next 7 days.
+
                     STRICT TIME CONSTRAINTS:
                     - Only suggest 'best_start_time' between 08:00 AM and 12:00 AM (Midnight).
-                    - Do not suggest early morning runs before 08:00 AM.
+                    - Do not suggest early morning runs before 08:00 AM.";
 
-                    STRICT REQUIREMENT: Return ONLY a raw JSON object. No markdown blocks.
-                    SCHEMA:
-                    {{
-                        ""location"": ""{Location}"",
-                        ""overall_score"": 0-100,
-                        ""buddy_tip"": ""string"",
-                        ""daily_suggestions"": [
-                            {{ ""day of the week name and short date"": ""string"", ""best_start_time"": ""string"", ""Weather Description"":""string"", ""reason"": ""string"", ""aqi"": 0 }}
-                        ]
-                    }}";
+        // Inject User Overrides here
+        if (!string.IsNullOrEmpty(UserInstructions))
+        {
+            prompt += $@"
+                                USER SPECIFIC OVERRIDES:
+                                - CONSIDER: The user has provided these specific constraints: '{UserInstructions}'. 
+                                - You must prioritize these instructions over your standard coaching logic (e.g., if they say 'skip Wednesday', do not provide a suggestion for that day).";
+        }
+
+        prompt += @"
+                            STRICT REQUIREMENT: Return ONLY a raw JSON object. No markdown blocks.
+                            SCHEMA:
+                            {
+                                ""location"": ""{Location}"",
+                                ""overall_score"": 0-100,
+                                ""buddy_tip"": ""string"",
+                                ""daily_suggestions"": [
+                                    { ""day of the week name and short date"": ""string"", ""best_start_time"": ""string"", ""Weather Description"":""string"", ""reason"": ""string"", ""aqi"": 0 }
+                                ],
+                                ""location_activities"" : [{""alerts"":""string""}]
+                            }";
 
         //var response = await _chatClient.GetResponseAsync<RunningPlan>(prompt);
         //RecommendationPlan = response.Result;
 
-        var jsonResponse = "{\"location\":\"Kalamaria\",\"overallScore\":85,\"buddyTip\":\"Opt for running during times when the weather conditions and air quality are favorable.\",\"dailySuggestions\":[{\"day\":\"Δευτέρα, Απρ 06, 2026\",\"bestStartTime\":\"20:00\",\"reason\":\"Clear weather and moderate AQI during this time.\",\"weatherDescription\":\"Few clouds, 22°C, humidity 40%.\",\"aqi\":75},{\"day\":\"Τρίτη, Απρ 07, 2026\",\"bestStartTime\":\"19:30\",\"reason\":\"Comfortable evening conditions with fewer atmospheric pollutants.\",\"weatherDescription\":\"Partly cloudy, 20°C, humidity 43%.\",\"aqi\":70},{\"day\":\"Τετάρτη, Απρ 08, 2026\",\"bestStartTime\":\"18:45\",\"reason\":\"Optimum temperature and moderate air quality.\",\"weatherDescription\":\"Cloudy, 21°C, humidity 45%.\",\"aqi\":72},{\"day\":\"Πέμπτη, Απρ 09, 2026\",\"bestStartTime\":\"20:15\",\"reason\":\"Late evening provides balanced humidity and AQI levels.\",\"weatherDescription\":\"Clear sky, 22°C, humidity 38%.\",\"aqi\":68},{\"day\":\"Παρασκευή, Απρ 10, 2026\",\"bestStartTime\":\"19:15\",\"reason\":\"Weather stabilizes for evening runs.\",\"weatherDescription\":\"Few clouds, 20°C, humidity 40%.\",\"aqi\":73},{\"day\":\"Σάββατο, Απρ 11, 2026\",\"bestStartTime\":\"18:50\",\"reason\":\"Best conditions for prolonged runs.\",\"weatherDescription\":\"Clear sky, 22°C, humidity 39%.\",\"aqi\":71},{\"day\":\"Κυριακή, Απρ 12, 2026\",\"bestStartTime\":\"19:00\",\"reason\":\"Improved air conditions expected.\",\"weatherDescription\":\"Partly cloudy, 21°C, humidity 41%.\",\"aqi\":69}]}";
+        var jsonResponse = "{\"location\":\"Kalamaria\",\"overall_score\":75,\"buddy_tip\":\"Ensure to stay hydrated during your runs due to moderate air quality.\",\"daily_suggestions\":[{\"day\":\"Τετάρτη, Απρ 15, 2026\",\"best_start_time\":\"09:00 AM\",\"weather_description\":\"18°C, Overcast Clouds\",\"reason\":\"Comfortable temperature and permissible AQI (Moderate).\",\"aqi\":75},{\"day\":\"Πέμπτη, Απρ 16, 2026\",\"best_start_time\":\"07:30 PM\",\"weather_description\":\"19°C, Partly Cloudy\",\"reason\":\"Optimal evening conditions with cooler temperatures and permissible air quality.\",\"aqi\":70},{\"day\":\"Παρασκευή, Απρ 17, 2026\",\"best_start_time\":\"08:30 PM\",\"weather_description\":\"20°C, Clear Skies\",\"reason\":\"Pleasant clear skies for an evening jog.\",\"aqi\":65},{\"day\":\"Σάββατο, Απρ 18, 2026\",\"best_start_time\":\"10:00 AM\",\"weather_description\":\"22°C, Sunny\",\"reason\":\"Bright and sunny morning for a vibrant start.\",\"aqi\":60},{\"day\":\"Κυριακή, Απρ 19, 2026\",\"best_start_time\":\"06:00 PM\",\"weather_description\":\"23°C, Light Breeze\",\"reason\":\"Warm evening with pleasant breezes.\",\"aqi\":55},{\"day\":\"Δευτέρα, Απρ 20, 2026\",\"best_start_time\":\"09:00 PM\",\"weather_description\":\"18°C, Partly Cloudy\",\"reason\":\"Cool night perfect for a jog.\",\"aqi\":62},{\"day\":\"Τρίτη, Απρ 21, 2026\",\"best_start_time\":\"11:00 PM\",\"weather_description\":\"17°C, Clear Skies\",\"reason\":\"Late-night run with clear skies is refreshing.\",\"aqi\":60}],\"location_activities\":[\"Participate in the annual Kalamaria Urban Marathon this Sunday.\"]}";
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
-
         RecommendationPlan = JsonSerializer.Deserialize<RunningPlan>(jsonResponse, options);
     }
 
@@ -165,4 +195,58 @@ public partial class MainPageViewModel : ObservableObject
         5 => "Very Poor 💀",
         _ => "Unknown"
     };
+
+    [RelayCommand]
+    public async Task AddToCalendar(DaySuggestion suggestion)
+    {
+        if (suggestion == null)
+        {
+            return;
+        }
+
+        try
+        {
+            DateTime datePart = DateTime.Parse(suggestion.Day);
+            DateTime timePart = DateTime.Parse(suggestion.BestStartTime);
+            DateTime start = new DateTime(
+                datePart.Year,
+                datePart.Month,
+                datePart.Day,
+                timePart.Hour,
+                timePart.Minute,
+                0);
+
+            DateTime end = start.AddHours(1);
+
+            string startStr = start.ToString("yyyyMMddTHHmmss");
+            string endStr = end.ToString("yyyyMMddTHHmmss");
+
+            var icsBuilder = new StringBuilder();
+            icsBuilder.AppendLine("BEGIN:VCALENDAR");
+            icsBuilder.AppendLine("VERSION:2.0");
+            icsBuilder.AppendLine("PRODID:-//RunnerBuddy//NONSGML v1.0//EN");
+            icsBuilder.AppendLine("BEGIN:VEVENT");
+            icsBuilder.AppendLine($"DTSTART:{startStr}");
+            icsBuilder.AppendLine($"DTEND:{endStr}");
+            icsBuilder.AppendLine($"SUMMARY:🏃 RunnerBuddy: {suggestion.WeatherDescription}");
+            icsBuilder.AppendLine($"DESCRIPTION:{suggestion.Reason}");
+            icsBuilder.AppendLine("LOCATION:Outdoors");
+            icsBuilder.AppendLine("END:VEVENT");
+            icsBuilder.AppendLine("END:VCALENDAR");
+
+            string filePath = Path.Combine(FileSystem.CacheDirectory, "RunSchedule.ics");
+            await File.WriteAllTextAsync(filePath, icsBuilder.ToString());
+
+            await Share.Default.RequestAsync(new ShareFileRequest
+            {
+                Title = "Add Run to Calendar",
+                File = new ShareFile(filePath)
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Full refresh cycle failed");
+            await Shell.Current.DisplayAlertAsync("Error", $"Calendar Share Error: {ex.Message}", "OK");
+        }
+    }
 }

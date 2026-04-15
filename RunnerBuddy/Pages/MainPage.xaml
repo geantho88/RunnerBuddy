@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/maui/global"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:modelsRecommendationPlan="clr-namespace:RunnerBuddy.Models.RecommendationPlan"
+    xmlns:skia="clr-namespace:SkiaSharp.Extended.UI.Controls;assembly=SkiaSharp.Extended.UI"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     x:DataType="MainPageViewModel">
 
@@ -26,6 +27,7 @@
                     FontAttributes="Bold"
                     FontSize="24"
                     Text="RunnerBuddy"
+                    TextColor="#1B3039"
                     VerticalOptions="Center" />
             </HorizontalStackLayout>
 
@@ -35,6 +37,7 @@
                     FontAttributes="Bold"
                     FontSize="24"
                     Text="Quick Stats"
+                    TextColor="#1B3039"
                     VerticalOptions="Center" />
             </HorizontalStackLayout>
 
@@ -137,7 +140,7 @@
                     FontAttributes="Bold"
                     FontSize="24"
                     Text="Get Recommendations"
-                    TextColor="#1C1C1E" />
+                    TextColor="#1B3039" />
 
                 <Border
                     Padding="0"
@@ -166,12 +169,29 @@
                                 StrokeShape="RoundRectangle 25"
                                 VerticalOptions="Center"
                                 WidthRequest="178">
-                                <Image Aspect="AspectFit" Source="buddy_icon.png" />
+                                <Grid RowDefinitions="Auto">
+                                    <Image
+                                        Grid.Row="0"
+                                        Aspect="AspectFit "
+                                        HeightRequest="140"
+                                        IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                        Source="buddy_icon.png"
+                                        WidthRequest="140" />
+                                    <skia:SKLottieView
+                                        Grid.Row="0"
+                                        HeightRequest="100"
+                                        IsAnimationEnabled="{Binding IsBusy}"
+                                        IsVisible="{Binding IsBusy}"
+                                        RepeatCount="-1"
+                                        Source="ai_thinking.json"
+                                        WidthRequest="100" />
+                                </Grid>
+
                             </Border>
 
                             <Border
                                 Padding="15"
-                                BackgroundColor="#007AFF"
+                                BackgroundColor="#006064"
                                 MaximumWidthRequest="260"
                                 StrokeShape="RoundRectangle 15,15,15,0">
                                 <VerticalStackLayout Spacing="5">
@@ -195,11 +215,25 @@
                             BackgroundColor="#FAFAFA"
                             ColumnDefinitions="*, Auto"
                             ColumnSpacing="10"
+                            RowDefinitions="Auto,Auto"
+                            RowSpacing="25"
                             VerticalOptions="End">
+                            <Editor
+                                Grid.Row="0"
+                                Grid.ColumnSpan="2"
+                                AutoSize="TextChanges"
+                                BackgroundColor="Transparent"
+                                Keyboard="Chat"
+                                MinimumHeightRequest="50"
+                                Placeholder="Not happy with the plan? Give me more detail! Mention your preferred running hours, days to avoid, surface type (treadmill/trail), or if you’re feeling sore/tired and need a lighter week"
+                                PlaceholderColor="Gray"
+                                Text="{Binding UserInstructions}"
+                                VerticalTextAlignment="Center" />
                             <Button
+                                Grid.Row="1"
                                 Grid.Column="1"
-                                BackgroundColor="#007AFF"
-                                Command="{Binding GetRunningScheduleCommand}"
+                                BackgroundColor="#006064"
+                                Command="{Binding RefreshRunningScheduleCommand}"
                                 CornerRadius="22"
                                 FontAttributes="Bold"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
@@ -221,7 +255,7 @@
                     FontAttributes="Bold"
                     FontSize="24"
                     Text="Buddy's Best Windows"
-                    TextColor="#1C1C1E" />
+                    TextColor="#1B3039" />
 
                 <CollectionView
                     ItemSizingStrategy="MeasureAllItems"
@@ -318,12 +352,13 @@
                                         <Button
                                             Grid.Row="6"
                                             Padding="12,8"
-                                            BackgroundColor="#007AFF"
-                                            Command="{Binding AddToCalendarCommand}"
+                                            BackgroundColor="#006064"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type MainPageViewModel}}, Path=AddToCalendarCommand}"
+                                            CommandParameter="{Binding .}"
                                             CornerRadius="25"
                                             FontAttributes="Bold"
                                             FontSize="14"
-                                            Text="Add to Schedule"
+                                            Text="Add to Calendar"
                                             TextColor="White" />
                                     </Grid>
                                 </Border>
@@ -350,12 +385,12 @@
                                 FontAttributes="Bold"
                                 FontSize="14"
                                 Text="BUDDY TIP"
-                                TextColor="#1C1C1E" />
+                                TextColor="#1B3039" />
                             <Label
                                 FontSize="16"
                                 LineBreakMode="WordWrap"
                                 Text="{Binding RecommendationPlan.BuddyTip}"
-                                TextColor="#333333" />
+                                TextColor="#1B3039" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
@@ -366,25 +401,38 @@
             <Label
                 FontAttributes="Bold"
                 FontSize="24"
-                Text="City Activity" />
+                Text="City Activity"
+                TextColor="#1B3039" />
             <Border
                 Padding="15"
                 BackgroundColor="#FFF5F5"
                 Stroke="Red"
                 StrokeShape="RoundRectangle 12">
-                <HorizontalStackLayout Spacing="10">
-                    <Label
-                        FontSize="18"
-                        Text="⚠️"
-                        VerticalOptions="Center" />
-                    <VerticalStackLayout Spacing="2">
-                        <Label
-                            FontAttributes="Bold"
-                            Text="ALERTS:"
-                            TextColor="Red" />
-                        <Label FontSize="12" Text="1 Roadblock (Main St. event) - Re-route planned." />
-                    </VerticalStackLayout>
-                </HorizontalStackLayout>
+                <CollectionView
+                    ItemSizingStrategy="MeasureAllItems"
+                    ItemsSource="{Binding RecommendationPlan.LocationActivities}"
+                    SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <VerticalStackLayout Spacing="10">
+                                <Label
+                                    FontSize="18"
+                                    Text="⚠️"
+                                    VerticalOptions="Center" />
+                                <VerticalStackLayout Spacing="2">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        Text="ALERTS:"
+                                        TextColor="Red" />
+                                    <Label
+                                        FontSize="12"
+                                        Text="{Binding}"
+                                        TextColor="#1B3039" />
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Border>
         </VerticalStackLayout>
     </ScrollView>

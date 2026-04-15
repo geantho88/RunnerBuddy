@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using RunnerBuddy.Pages;
 using RunnerBuddy.Services;
 using RunnerBuddy.ViewModels;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
 using System.Reflection;
 
@@ -19,6 +20,7 @@ namespace RunnerBuddy
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseSkiaSharp()
                 .UseMauiCommunityToolkit()
                 .ConfigureSyncfusionToolkit()
                 .ConfigureFonts(fonts =>
