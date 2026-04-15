@@ -17,7 +17,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="25">
 
-            <!--  Quick Stats Section  -->
+            <!--  Header Section  -->
             <HorizontalStackLayout>
                 <Image
                     HeightRequest="48"
@@ -40,8 +40,6 @@
                     TextColor="#1B3039"
                     VerticalOptions="Center" />
             </HorizontalStackLayout>
-
-
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="15">
                 <Border
                     Grid.Column="0"
@@ -56,6 +54,7 @@
                         <Label
                             FontSize="12"
                             HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
                             TextColor="Gray">
                             <Label.FormattedText>
                                 <FormattedString>
@@ -67,7 +66,8 @@
                         <Label
                             FontAttributes="Bold"
                             FontSize="18"
-                            HorizontalOptions="Center">
+                            HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center">
                             <Label.FormattedText>
                                 <FormattedString>
                                     <Span FontAttributes="Bold" Text="{Binding WeatherDescription}" />
@@ -79,7 +79,6 @@
                         </Label>
                     </VerticalStackLayout>
                 </Border>
-
                 <Border
                     Grid.Column="1"
                     Padding="12"
@@ -94,21 +93,23 @@
                             FontAttributes="Bold"
                             FontSize="12"
                             HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
                             Text="Air Quality Now"
                             TextColor="Gray" />
                         <Label
                             FontAttributes="Bold"
                             FontSize="18"
                             HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
                             Text="{Binding AirQuality}" />
                         <Label
                             FontSize="14"
                             HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
                             Text="{Binding AirQualityAdditionalInfos}"
                             TextColor="Gray" />
                     </VerticalStackLayout>
                 </Border>
-
                 <Border
                     Grid.Column="2"
                     Padding="12"
@@ -123,12 +124,14 @@
                             FontAttributes="Bold"
                             FontSize="12"
                             HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
                             Text="Humidity Now"
                             TextColor="Gray" />
                         <Label
                             FontAttributes="Bold"
                             FontSize="18"
                             HorizontalOptions="Center"
+                            HorizontalTextAlignment="Center"
                             Text="{Binding Humidity}" />
                     </VerticalStackLayout>
                 </Border>
@@ -157,62 +160,107 @@
 
                     <Grid RowDefinitions="Auto, Auto">
 
-                        <HorizontalStackLayout
-                            Grid.Row="0"
-                            Padding="15"
-                            Spacing="10"
-                            VerticalOptions="Start">
+                        <ContentView Grid.Row="0">
+                            <OnPlatform x:TypeArguments="View">
 
-                            <Border
-                                HeightRequest="178"
-                                HorizontalOptions="Start"
-                                StrokeShape="RoundRectangle 25"
-                                VerticalOptions="Center"
-                                WidthRequest="178">
-                                <Grid RowDefinitions="Auto">
-                                    <Image
-                                        Grid.Row="0"
-                                        Aspect="AspectFit "
-                                        HeightRequest="140"
-                                        IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                                        Source="buddy_icon.png"
-                                        WidthRequest="140" />
-                                    <skia:SKLottieView
-                                        Grid.Row="0"
-                                        HeightRequest="100"
-                                        IsAnimationEnabled="{Binding IsBusy}"
-                                        IsVisible="{Binding IsBusy}"
-                                        RepeatCount="-1"
-                                        Source="ai_thinking.json"
-                                        WidthRequest="100" />
-                                </Grid>
+                                <On Platform="WinUI">
+                                    <HorizontalStackLayout
+                                        Padding="15"
+                                        Spacing="10"
+                                        VerticalOptions="Start">
+                                        <Border>
+                                            <Grid RowDefinitions="Auto">
+                                                <Image
+                                                    Aspect="AspectFit"
+                                                    HeightRequest="140"
+                                                    IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                                    Source="buddy_icon.png"
+                                                    WidthRequest="140" />
+                                                <skia:SKLottieView
+                                                    HeightRequest="100"
+                                                    IsAnimationEnabled="{Binding IsBusy}"
+                                                    IsVisible="{Binding IsBusy}"
+                                                    RepeatCount="-1"
+                                                    Source="ai_thinking.json"
+                                                    WidthRequest="100" />
+                                            </Grid>
+                                        </Border>
 
-                            </Border>
+                                        <Border
+                                            Padding="15"
+                                            BackgroundColor="#006064"
+                                            MaximumWidthRequest="260"
+                                            StrokeShape="RoundRectangle 15,15,15,0">
+                                            <VerticalStackLayout Spacing="5">
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    FontSize="14"
+                                                    Text="RunnerBuddy"
+                                                    TextColor="#D1E9FF" />
+                                                <Label
+                                                    FontSize="15"
+                                                    LineBreakMode="WordWrap"
+                                                    Text="I’ve locked onto your coordinates! I’m ready to analyze weather conditions..."
+                                                    TextColor="White" />
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </HorizontalStackLayout>
+                                </On>
 
-                            <Border
-                                Padding="15"
-                                BackgroundColor="#006064"
-                                MaximumWidthRequest="260"
-                                StrokeShape="RoundRectangle 15,15,15,0">
-                                <VerticalStackLayout Spacing="5">
-                                    <Label
-                                        FontAttributes="Bold"
-                                        FontSize="14"
-                                        Text="RunnerBuddy"
-                                        TextColor="#D1E9FF" />
-                                    <Label
-                                        FontSize="15"
-                                        LineBreakMode="WordWrap"
-                                        Text="I’ve locked onto your coordinates in! I’m ready to analyze the weather conditions and other environmental factors in your area to find your best run windows. Not satisfied with my recommendations? Set your preferences and try again! 🏃‍♂️"
-                                        TextColor="White" />
-                                </VerticalStackLayout>
-                            </Border>
-                        </HorizontalStackLayout>
+                                <On Platform="Android">
+                                    <VerticalStackLayout
+                                        Padding="15"
+                                        HorizontalOptions="Center"
+                                        Spacing="0">
+                                        <Border
+                                            HeightRequest="178"
+                                            HorizontalOptions="Center"
+                                            StrokeShape="RoundRectangle 25"
+                                            WidthRequest="178">
+                                            <Grid RowDefinitions="Auto">
+                                                <Image
+                                                    Aspect="AspectFit"
+                                                    HeightRequest="140"
+                                                    IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                                    Source="buddy_icon.png"
+                                                    WidthRequest="140" />
+                                                <skia:SKLottieView
+                                                    HeightRequest="100"
+                                                    IsAnimationEnabled="{Binding IsBusy}"
+                                                    IsVisible="{Binding IsBusy}"
+                                                    RepeatCount="-1"
+                                                    Source="ai_thinking.json"
+                                                    WidthRequest="100" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border
+                                            Padding="15"
+                                            BackgroundColor="#006064"
+                                            StrokeShape="RoundRectangle 15">
+                                            <VerticalStackLayout Spacing="5">
+                                                <Label
+                                                    FontAttributes="Bold"
+                                                    FontSize="14"
+                                                    Text="RunnerBuddy"
+                                                    TextColor="#D1E9FF" />
+                                                <Label
+                                                    FontSize="15"
+                                                    LineBreakMode="WordWrap"
+                                                    Text="I’ve locked onto your coordinates! I’m ready to analyze weather conditions..."
+                                                    TextColor="White" />
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </On>
+
+                            </OnPlatform>
+                        </ContentView>
 
                         <Grid
                             Grid.Row="1"
                             Padding="15,10"
-                            BackgroundColor="#FAFAFA"
+                            BackgroundColor="#ffffff"
                             ColumnDefinitions="*, Auto"
                             ColumnSpacing="10"
                             RowDefinitions="Auto,Auto"
@@ -222,7 +270,7 @@
                                 Grid.Row="0"
                                 Grid.ColumnSpan="2"
                                 AutoSize="TextChanges"
-                                BackgroundColor="Transparent"
+                                BackgroundColor="#FAFAFA"
                                 Keyboard="Chat"
                                 MinimumHeightRequest="50"
                                 Placeholder="Not happy with the plan? Give me more detail! Mention your preferred running hours, days to avoid, surface type (treadmill/trail), or if you’re feeling sore/tired and need a lighter week"
@@ -405,7 +453,7 @@
                 TextColor="#1B3039" />
             <Border
                 Padding="15"
-                BackgroundColor="#FFF5F5"
+                BackgroundColor="#FFFFFF"
                 Stroke="Red"
                 StrokeShape="RoundRectangle 12">
                 <CollectionView
