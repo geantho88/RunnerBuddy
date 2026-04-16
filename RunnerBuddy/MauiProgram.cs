@@ -1,6 +1,7 @@
 ﻿using Azure.AI.OpenAI;
 using CommunityToolkit.Maui;
 using Fonts;
+using Java.Util.Logging;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using RunnerBuddy.ViewModels;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
 using System.Reflection;
+using Xamarin.Google.Crypto.Tink.Shaded.Protobuf;
 
 namespace RunnerBuddy
 {
@@ -63,6 +65,7 @@ namespace RunnerBuddy
                     throw new InvalidOperationException("AzureOpenAI settings are missing in AppSettings.json");
                 }
 
+                //This is model - level API, not agent-level API - Most apps are better with one smart agent
                 var client = new AzureOpenAIClient(new Uri(endpoint), new System.ClientModel.ApiKeyCredential(apiKey));
                 return client.GetChatClient(model).AsIChatClient();
             });
