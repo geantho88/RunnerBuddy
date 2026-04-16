@@ -175,15 +175,15 @@ public partial class MainPageViewModel : ObservableObject
                                 ""location_activities"" : [{""alerts"":""string""}]
                             }";
 
-        //var response = await _chatClient.GetResponseAsync<RunningPlan>(prompt);
-        //RecommendationPlan = response.Result;
+        var response = await _chatClient.GetResponseAsync<RunningPlan>(prompt);
+        RecommendationPlan = response.Result;
 
-        var jsonResponse = "{\"location\":\"Kalamaria\",\"overall_score\":75,\"buddy_tip\":\"Ensure to stay hydrated during your runs due to moderate air quality.\",\"daily_suggestions\":[{\"day\":\"Τετάρτη, Απρ 15, 2026\",\"best_start_time\":\"09:00 AM\",\"weather_description\":\"18°C, Overcast Clouds\",\"reason\":\"Comfortable temperature and permissible AQI (Moderate).\",\"aqi\":75},{\"day\":\"Πέμπτη, Απρ 16, 2026\",\"best_start_time\":\"07:30 PM\",\"weather_description\":\"19°C, Partly Cloudy\",\"reason\":\"Optimal evening conditions with cooler temperatures and permissible air quality.\",\"aqi\":70},{\"day\":\"Παρασκευή, Απρ 17, 2026\",\"best_start_time\":\"08:30 PM\",\"weather_description\":\"20°C, Clear Skies\",\"reason\":\"Pleasant clear skies for an evening jog.\",\"aqi\":65},{\"day\":\"Σάββατο, Απρ 18, 2026\",\"best_start_time\":\"10:00 AM\",\"weather_description\":\"22°C, Sunny\",\"reason\":\"Bright and sunny morning for a vibrant start.\",\"aqi\":60},{\"day\":\"Κυριακή, Απρ 19, 2026\",\"best_start_time\":\"06:00 PM\",\"weather_description\":\"23°C, Light Breeze\",\"reason\":\"Warm evening with pleasant breezes.\",\"aqi\":55},{\"day\":\"Δευτέρα, Απρ 20, 2026\",\"best_start_time\":\"09:00 PM\",\"weather_description\":\"18°C, Partly Cloudy\",\"reason\":\"Cool night perfect for a jog.\",\"aqi\":62},{\"day\":\"Τρίτη, Απρ 21, 2026\",\"best_start_time\":\"11:00 PM\",\"weather_description\":\"17°C, Clear Skies\",\"reason\":\"Late-night run with clear skies is refreshing.\",\"aqi\":60}],\"location_activities\":[\"Participate in the annual Kalamaria Urban Marathon this Sunday.\"]}";
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        RecommendationPlan = JsonSerializer.Deserialize<RunningPlan>(jsonResponse, options);
+        //var jsonResponse = "{\"location\":\"Kalamaria\",\"overall_score\":75,\"buddy_tip\":\"Ensure to stay hydrated during your runs due to moderate air quality.\",\"daily_suggestions\":[{\"day\":\"Τετάρτη, Απρ 15, 2026\",\"best_start_time\":\"09:00 AM\",\"weather_description\":\"18°C, Overcast Clouds\",\"reason\":\"Comfortable temperature and permissible AQI (Moderate).\",\"aqi\":75},{\"day\":\"Πέμπτη, Απρ 16, 2026\",\"best_start_time\":\"07:30 PM\",\"weather_description\":\"19°C, Partly Cloudy\",\"reason\":\"Optimal evening conditions with cooler temperatures and permissible air quality.\",\"aqi\":70},{\"day\":\"Παρασκευή, Απρ 17, 2026\",\"best_start_time\":\"08:30 PM\",\"weather_description\":\"20°C, Clear Skies\",\"reason\":\"Pleasant clear skies for an evening jog.\",\"aqi\":65},{\"day\":\"Σάββατο, Απρ 18, 2026\",\"best_start_time\":\"10:00 AM\",\"weather_description\":\"22°C, Sunny\",\"reason\":\"Bright and sunny morning for a vibrant start.\",\"aqi\":60},{\"day\":\"Κυριακή, Απρ 19, 2026\",\"best_start_time\":\"06:00 PM\",\"weather_description\":\"23°C, Light Breeze\",\"reason\":\"Warm evening with pleasant breezes.\",\"aqi\":55},{\"day\":\"Δευτέρα, Απρ 20, 2026\",\"best_start_time\":\"09:00 PM\",\"weather_description\":\"18°C, Partly Cloudy\",\"reason\":\"Cool night perfect for a jog.\",\"aqi\":62},{\"day\":\"Τρίτη, Απρ 21, 2026\",\"best_start_time\":\"11:00 PM\",\"weather_description\":\"17°C, Clear Skies\",\"reason\":\"Late-night run with clear skies is refreshing.\",\"aqi\":60}],\"location_activities\":[\"Participate in the annual Kalamaria Urban Marathon this Sunday.\"]}";
+        //var options = new JsonSerializerOptions
+        //{
+        //    PropertyNameCaseInsensitive = true
+        //};
+        //RecommendationPlan = JsonSerializer.Deserialize<RunningPlan>(jsonResponse, options);
     }
 
     private string GetAqiDescription(int aqi) => aqi switch

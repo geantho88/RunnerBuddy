@@ -1,7 +1,6 @@
 ﻿using Azure.AI.OpenAI;
 using CommunityToolkit.Maui;
 using Fonts;
-using Java.Util.Logging;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -11,7 +10,6 @@ using RunnerBuddy.ViewModels;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
 using System.Reflection;
-using Xamarin.Google.Crypto.Tink.Shaded.Protobuf;
 
 namespace RunnerBuddy
 {
