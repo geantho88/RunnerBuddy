@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using RunnerBuddy.Models.RecommendationPlan;
 using RunnerBuddy.Services;
 using System.Text;
-using System.Text.Json;
 
 namespace RunnerBuddy.ViewModels;
 
@@ -15,6 +14,30 @@ public partial class MainPageViewModel : ObservableObject
     private readonly IWeatherService _weatherService;
     private readonly IChatClient _chatClient;
     private Location _currentLocation;
+
+    /* 
+     * MAUI and the MVVM Toolkit delete your boring code! (observable properties and commands, etc.)
+     * In traditional C# development with Xamarin.Forms, implementing the MVVM (Model-View-ViewModel) pattern 
+     * required a massive amount of "boilerplate" code. You had to manually implement INotifyPropertyChanged, 
+     * create backing fields, and write tedious wrappers for commands.
+     * The CommunityToolkit.Mvvm library uses Source Generators to write that code for you at compile-time. 
+     * Here is the breakdown of the benefits.
+     * Warning! Your class must be marked as partial --> because the toolkit needs to "finish" writing the class in a separate hidden file
+    
+    private bool isBusy;
+
+    public bool IsBusy
+    {
+        get => isBusy;
+        set
+        {
+            if (isBusy != value)
+            {
+                isBusy = value;
+                OnPropertyChanged(nameof(IsBusy)); // Manual notification
+            }
+        }
+    }*/
 
     [ObservableProperty] private bool isBusy;
     [ObservableProperty] private string location = "Locating...";
@@ -52,7 +75,6 @@ public partial class MainPageViewModel : ObservableObject
             if (await EnsureLocationPermissionsAsync())
             {
                 await GetCurrentLocationAsync();
-
                 await LoadWeatherAsync();
                 await GetRecommendationsAsync();
             }
@@ -84,6 +106,64 @@ public partial class MainPageViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    //Just like [ObservableProperty] kills the boilerplate for data, [RelayCommand] kills the boilerplate for actions.
+    //(The toolkit automatically builds the public Command property (adding the word "Command" to the end of your
+    //method name) for the UI to use)
+
+    [RelayCommand]
+    public async Task AddToCalendar(DaySuggestion suggestion)
+    {
+        if (suggestion == null)
+        {
+            return;
+        }
+
+        try
+        {
+            DateTime datePart = DateTime.Parse(suggestion.Day);
+            DateTime timePart = DateTime.Parse(suggestion.BestStartTime);
+            DateTime start = new DateTime(
+                datePart.Year,
+                datePart.Month,
+                datePart.Day,
+                timePart.Hour,
+                timePart.Minute,
+                0);
+
+            DateTime end = start.AddHours(1);
+
+            string startStr = start.ToString("yyyyMMddTHHmmss");
+            string endStr = end.ToString("yyyyMMddTHHmmss");
+
+            var icsBuilder = new StringBuilder();
+            icsBuilder.AppendLine("BEGIN:VCALENDAR");
+            icsBuilder.AppendLine("VERSION:2.0");
+            icsBuilder.AppendLine("PRODID:-//RunnerBuddy//NONSGML v1.0//EN");
+            icsBuilder.AppendLine("BEGIN:VEVENT");
+            icsBuilder.AppendLine($"DTSTART:{startStr}");
+            icsBuilder.AppendLine($"DTEND:{endStr}");
+            icsBuilder.AppendLine($"SUMMARY:🏃 RunnerBuddy: {suggestion.WeatherDescription}");
+            icsBuilder.AppendLine($"DESCRIPTION:{suggestion.Reason}");
+            icsBuilder.AppendLine("LOCATION:Outdoors");
+            icsBuilder.AppendLine("END:VEVENT");
+            icsBuilder.AppendLine("END:VCALENDAR");
+
+            string filePath = Path.Combine(FileSystem.CacheDirectory, "RunSchedule.ics");
+            await File.WriteAllTextAsync(filePath, icsBuilder.ToString());
+
+            await Share.Default.RequestAsync(new ShareFileRequest
+            {
+                Title = "Add Run to Calendar",
+                File = new ShareFile(filePath)
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Full refresh cycle failed");
+            await Shell.Current.DisplayAlertAsync("Error", $"Calendar Share Error: {ex.Message}", "OK");
         }
     }
 
@@ -195,58 +275,4 @@ public partial class MainPageViewModel : ObservableObject
         5 => "Very Poor 💀",
         _ => "Unknown"
     };
-
-    [RelayCommand]
-    public async Task AddToCalendar(DaySuggestion suggestion)
-    {
-        if (suggestion == null)
-        {
-            return;
-        }
-
-        try
-        {
-            DateTime datePart = DateTime.Parse(suggestion.Day);
-            DateTime timePart = DateTime.Parse(suggestion.BestStartTime);
-            DateTime start = new DateTime(
-                datePart.Year,
-                datePart.Month,
-                datePart.Day,
-                timePart.Hour,
-                timePart.Minute,
-                0);
-
-            DateTime end = start.AddHours(1);
-
-            string startStr = start.ToString("yyyyMMddTHHmmss");
-            string endStr = end.ToString("yyyyMMddTHHmmss");
-
-            var icsBuilder = new StringBuilder();
-            icsBuilder.AppendLine("BEGIN:VCALENDAR");
-            icsBuilder.AppendLine("VERSION:2.0");
-            icsBuilder.AppendLine("PRODID:-//RunnerBuddy//NONSGML v1.0//EN");
-            icsBuilder.AppendLine("BEGIN:VEVENT");
-            icsBuilder.AppendLine($"DTSTART:{startStr}");
-            icsBuilder.AppendLine($"DTEND:{endStr}");
-            icsBuilder.AppendLine($"SUMMARY:🏃 RunnerBuddy: {suggestion.WeatherDescription}");
-            icsBuilder.AppendLine($"DESCRIPTION:{suggestion.Reason}");
-            icsBuilder.AppendLine("LOCATION:Outdoors");
-            icsBuilder.AppendLine("END:VEVENT");
-            icsBuilder.AppendLine("END:VCALENDAR");
-
-            string filePath = Path.Combine(FileSystem.CacheDirectory, "RunSchedule.ics");
-            await File.WriteAllTextAsync(filePath, icsBuilder.ToString());
-
-            await Share.Default.RequestAsync(new ShareFileRequest
-            {
-                Title = "Add Run to Calendar",
-                File = new ShareFile(filePath)
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Full refresh cycle failed");
-            await Shell.Current.DisplayAlertAsync("Error", $"Calendar Share Error: {ex.Message}", "OK");
-        }
-    }
 }

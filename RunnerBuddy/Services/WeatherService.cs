@@ -10,12 +10,11 @@ using System.Reflection;
 public class WeatherService : IWeatherService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<WeatherService> _logger; // 1. Add Logger field
+    private readonly ILogger<WeatherService> _logger; 
 
     private readonly string _apiKey;
     private readonly string _baseUrl;
 
-    // 2. Inject ILogger via constructor
     public WeatherService(HttpClient httpClient, ILogger<WeatherService> logger)
     {
         _httpClient = httpClient;
